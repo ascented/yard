@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>jard</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            font-family: 'Space Mono';
+            font-size: 15px;
+        }
+
+        #wrapper {
+            width: 100%;
+            height: 100%;
+            background: white;
+        }
+
+        #test-block {
+            position: absolute;
+            top: 20%;
+            left: 20%;
+            width: 30px;
+            height: 30px;
+            border-radius: 10px;
+            border: 10px solid #2e70ff;
+            animation: rotation 3s infinite linear;
+        }
+
+        #data {
+            position: absolute;
+            padding: 15px;
+        }
+        
+        #data .field {
+            display: flex;
+        }
+
+        #data .field span {
+            min-width: 50px;
+        }
+
+        #data #field-x {
+            color: rgb(255, 52, 52);
+        }
+
+        #data #field-y {
+            color: rgb(45, 45, 255);
+        }
+
+        #data #field-vx {
+            color: rgb(255, 109, 133);
+        }
+
+        #data #field-vy {
+            color: #358dff
+        }
+
+        @keyframes rotation {
+            from { transform: rotate(0deg) }
+            to { transform: rotate(360deg) }
+        }
+    </style>
+</head>
+<body>
+    <div id="wrapper">
+        <div id="data">
+            <div class="field" id="field-x">
+                <span>x: </span><div class="value" id="x">0</div>
+            </div>
+            <div class="field" id="field-y">
+                <span>y: </span><div class="value" id="y">0</div>
+            </div>
+            <div class="field" id="field-vx">
+                <span>vx: </span><div class="value" id="vx">0</div>
+            </div>
+            <div class="field" id="field-vy">
+                <span>vy: </span><div class="value" id="vy">0</div>
+            </div>
+        </div>
+        <div id="test-block"></div>
+    </div>
+</body>
+<script src="https://cdn.socket.io/4.2.0/socket.io.min.js" integrity="sha384-PiBR5S00EtOj2Lto9Uu81cmoyZqR57XcOna1oAuVuIEjzj0wpqDVfD0JA9eXlRsj" crossorigin="anonymous"></script>
+<script>
+    const socket = io();
+
+    let testBlock = document.getElementById('test-block');
+    let xDisplay = document.getElementById('x');
+    let yDisplay = document.getElementById('y');
+    let vxDisplay = document.getElementById('vx');
+    let vyDisplay = document.getElementById('vy');
+
+    const speed = 10; // px
+
+    let x = testBlock.offsetLeft;
+    let y = testBlock.offsetTop;
+    let vectorX = 0;
+    let vectorY = 0;
+
+
+    const moveCycle = setInterval(() => {
+        let currentPositionX = testBlock.offsetLeft;
+        let currentPositionY = testBlock.offsetTop;
+        testBlock.style.left = (currentPositionX + vectorX * speed) + 'px';
+        testBlock.style.top = (currentPositionY + vectorY * speed) + 'px';
+
+        xDisplay.innerText = x;
+        yDisplay.innerText = y;
+        vxDisplay.innerText = vectorX.toFixed(2);
+        vyDisplay.innerText = vectorY.toFixed(2);
+    }, 0);
+
+    socket.on('move', moveData => {
+        vectorX = moveData.normalizedVectorX;
+        vectorY = moveData.normalizedVectorY;
+    });
+</script>
+</html>
